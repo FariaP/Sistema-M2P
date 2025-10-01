@@ -6,6 +6,15 @@ if (isset($_SESSION['user'])) {
   header('Location: listar_usuarios.php');
   exit;
 }
+
+// Verifica bloqueio
+$bloqueado = false;
+$tempo_restante = 0;
+if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) {
+    $bloqueado = true;
+    $tempo_restante = $_SESSION['bloqueio_login'] - time();
+    
+}
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -30,10 +39,13 @@ if (isset($_SESSION['user'])) {
       <?php if ($err): ?>
         <div class="alert"><?= htmlspecialchars($err) ?></div>
       <?php endif; ?>
+      <?php if ($bloqueado): ?>
+        <div class="alert">Login bloqueado por <?php echo $tempo_restante; ?> segundos. Aguarde.</div>
+      <?php endif; ?>
       <form class="form" method="post" action="login.php" autocomplete="off">
-        <input class="input" type="text" name="cpf_usuario" placeholder="CPF" required minlength="3" maxlength="80">
-        <input class="input" type="text" name="placa_hash" placeholder="Placa" required minlength="4" maxlength="64">
-        <button class="button" type="submit">ENTRAR</button>
+        <input class="input" type="text" name="cpf_usuario" placeholder="CPF" required minlength="3" maxlength="80" <?php echo $bloqueado ? 'disabled' : ''; ?>>
+        <input class="input" type="text" name="placa_hash" placeholder="Placa" required minlength="4" maxlength="64" <?php echo $bloqueado ? 'disabled' : ''; ?>>
+        <button class="button" type="submit" <?php echo $bloqueado ? 'disabled' : ''; ?>>ENTRAR</button>
       </form>
       <div class="helper">Ainda não é Cadastrado? <a href="register.php">Cadastre-se!</a></div>
     </div>
@@ -61,6 +73,13 @@ if (isset($_SESSION['user'])) {
       e.target.value = v;
     });
   </script>
+  <?php if ($bloqueado): ?>
+    <script>
+      setTimeout(function() {
+        window.location.reload();
+      }, <?php echo $tempo_restante * 1000; ?>);
+    </script>
+  <?php endif; ?>
 </body>
 
 </html>

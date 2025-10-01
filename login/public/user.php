@@ -3,7 +3,7 @@ session_start();
 // só entra se estiver logado e for usuário comum
 session_regenerate_id(true);
 if (!isset($_SESSION['user']) || $_SESSION['user']['tipo'] !== 'user') {
-    header("Location: index.php?err=Acesso não permitido.");
+    header('Location: index.php?err=' . urlencode('Acesso não permitido.'));
     exit;
 }
 

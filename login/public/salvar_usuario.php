@@ -10,7 +10,7 @@ $cpf_usuario = trim($_POST['cpf_usuario'] ?? '');
 $placa_hash = trim($_POST['placa_hash'] ?? '');
 
 if ($nome === '' || $telefone === '' || $cpf_usuario === '' || $placa_hash === '') {
-  header('Location: register.php?err=Preencha todos os campos.');
+  header('Location: register.php?err=' . urlencode('Preencha todos os campos.'));
   exit;
 }
 // if ($placa_hash !== $confirmar) {
@@ -26,11 +26,11 @@ try {
   $stmt->bindValue(':hash', $hash);
   $stmt->bindValue(':placa', $placa_hash);
   $stmt->execute();
-  header('Location: index.php?ok=Cadastro realizado! Faça login.');
+  header('Location: index.php?ok=' . urlencode('Cadastro realizado! Faça login.'));
 } catch (PDOException $e) {
   if (($e->errorInfo[1] ?? 0) == 1062) {
-    header('Location: register.php?err=Usuário já existe.');
+    header('Location: register.php?err=' . urlencode('Usuário já existe.'));
   } else {
-    header('Location: register.php?err=Erro ao salvar.');
+    header('Location: register.php?err=' . urlencode('Erro ao salvar.'));
   }
 }

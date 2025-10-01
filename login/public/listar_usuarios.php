@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../app/config.php';
 session_start();
 if (!isset($_SESSION['user'])) {
-    header('Location:index.php?err=Faça login para continuar.');
+    header('Location: index.php?err=' . urlencode('Faça login para continuar.'));
     exit;
 }
 $rows = $pdo->query('SELECT id,nome,telefone,cpf_usuario,placa,criado_em FROM usuarios ORDER BY id DESC')->fetchAll();
