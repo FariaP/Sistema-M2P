@@ -15,9 +15,9 @@ require_once __DIR__ . '/../app/config.php';
 if ($_SESSION['bloqueio_login'] > time()) {
     $restante = $_SESSION['bloqueio_login'] - time();
     $msg = 'Login bloqueado por ' . $restante . ' segundos. Aguarde.';
-    $_SESSION['flash_err'] = $msg;
+    $_SESSION['err'] = $msg;
     session_write_close();
-    header('Location: index.php?err=' . urlencode($msg));
+    header('Location: index.php');
     exit;
 }
 
@@ -36,7 +36,8 @@ $senha = trim($_POST['placa_hash'] ?? '');
 
 // validação básica
 if ($cpf === '' || $senha === '') {
-    header('Location: index.php?err=' . urlencode('Informe usuário e senha.'));
+    $_SESSION['err'] = 'Informe usuário e senha.';
+    header('Location: index.php');
     exit;
 }
 
@@ -58,7 +59,6 @@ try {
             'cpf_usuario' => $usuario['cpf_usuario'],
             'tipo' => $usuario['tipo']
         ];
-
         // redireciona de acordo com o tipo
         if ($usuario['tipo'] === 'admin') {
             header("Location: admin.php");
@@ -72,14 +72,12 @@ try {
         if ($_SESSION['tentativas'] >= 5) {
             $_SESSION['bloqueio_login'] = time() + 30;
             $_SESSION['tentativas'] = 0;
-            // $msg = 'Login bloqueado por 30 segundos após 5 tentativas erradas.';
         } else {
             $msg = 'Credenciais inválidas.';
+            $_SESSION['err'] = $msg;
         }
-        // define flash para garantir que a mensagem chegue ao index mesmo que a querystring se perca
-        $_SESSION['flash_err'] = $msg;
         session_write_close();
-        header('Location: index.php?err=' . urlencode($msg));
+        header('Location: index.php');
         exit;
     }
 

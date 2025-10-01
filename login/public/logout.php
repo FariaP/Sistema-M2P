@@ -1,5 +1,9 @@
-<?php session_start();
+<?php
+session_start();
 session_unset();
 session_destroy();
-header('Location: index.php?ok=' . urlencode('Você saiu com sucesso.'));
+// Inicia nova sessão para mensagem
+session_start();
+$_SESSION['mensagem_logout'] = 'Você saiu com sucesso.';
+header('Location: index.php');
 exit;

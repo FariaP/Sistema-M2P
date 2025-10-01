@@ -10,13 +10,12 @@ $cpf_usuario = trim($_POST['cpf_usuario'] ?? '');
 $placa_hash = trim($_POST['placa_hash'] ?? '');
 
 if ($nome === '' || $telefone === '' || $cpf_usuario === '' || $placa_hash === '') {
-  header('Location: register.php?err=' . urlencode('Preencha todos os campos.'));
+  session_start();
+  $_SESSION['err'] = 'Preencha todos os campos.';
+  header('Location: register.php');
   exit;
 }
-// if ($placa_hash !== $confirmar) {
-//   header('Location: register.php?err=As senhas não conferem.');
-//   exit;
-// }
+
 try {
   $hash = password_hash($placa_hash, PASSWORD_BCRYPT);
   $stmt = $pdo->prepare('INSERT INTO usuarios (nome, telefone, cpf_usuario, placa_hash, placa) VALUES (:nome,:telefone,:cpf_usuario,:hash, :placa)');
@@ -26,11 +25,17 @@ try {
   $stmt->bindValue(':hash', $hash);
   $stmt->bindValue(':placa', $placa_hash);
   $stmt->execute();
-  header('Location: index.php?ok=' . urlencode('Cadastro realizado! Faça login.'));
+  session_start();
+  $_SESSION['ok'] = 'Cadastro realizado! Faça login.';
+  header('Location: index.php');
 } catch (PDOException $e) {
   if (($e->errorInfo[1] ?? 0) == 1062) {
-    header('Location: register.php?err=' . urlencode('Usuário já existe.'));
+    session_start();
+    $_SESSION['err'] = 'Usuário já existe.';
+    header('Location: register.php');
   } else {
-    header('Location: register.php?err=' . urlencode('Erro ao salvar.'));
+    session_start();
+    $_SESSION['err'] = 'Erro ao salvar.';
+    header('Location: register.php');
   }
 }

@@ -1,19 +1,19 @@
 <?php
 session_start();
-$ok = $_GET['ok'] ?? '';
-$err = $_GET['err'] ?? '';
+// Mensagens de feedback via sessão
+$ok = $_SESSION['mensagem_logout'] ?? $_SESSION['ok'] ?? '';
+$err = $_SESSION['err'] ?? '';
+unset($_SESSION['mensagem_logout'], $_SESSION['ok'], $_SESSION['err']);
 if (isset($_SESSION['user'])) {
   header('Location: listar_usuarios.php');
   exit;
 }
-
 // Verifica bloqueio
 $bloqueado = false;
 $tempo_restante = 0;
 if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) {
-    $bloqueado = true;
-    $tempo_restante = $_SESSION['bloqueio_login'] - time();
-    
+  $bloqueado = true;
+  $tempo_restante = $_SESSION['bloqueio_login'] - time();
 }
 ?>
 <!doctype html>
@@ -43,8 +43,10 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
         <div class="alert">Login bloqueado por <?php echo $tempo_restante; ?> segundos. Aguarde.</div>
       <?php endif; ?>
       <form class="form" method="post" action="login.php" autocomplete="off">
-        <input class="input" type="text" name="cpf_usuario" placeholder="CPF" required minlength="3" maxlength="80" <?php echo $bloqueado ? 'disabled' : ''; ?>>
-        <input class="input" type="text" name="placa_hash" placeholder="Placa" required minlength="4" maxlength="64" <?php echo $bloqueado ? 'disabled' : ''; ?>>
+        <input class="input" type="text" name="cpf_usuario" placeholder="CPF" required minlength="3" maxlength="80"
+          <?php echo $bloqueado ? 'disabled' : ''; ?>>
+        <input class="input" type="text" name="placa_hash" placeholder="Placa" required minlength="4" maxlength="64"
+          <?php echo $bloqueado ? 'disabled' : ''; ?>>
         <button class="button" type="submit" <?php echo $bloqueado ? 'disabled' : ''; ?>>ENTRAR</button>
       </form>
       <div class="helper">Ainda não é Cadastrado? <a href="register.php">Cadastre-se!</a></div>
@@ -75,7 +77,7 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
   </script>
   <?php if ($bloqueado): ?>
     <script>
-      setTimeout(function() {
+      setTimeout(function () {
         window.location.reload();
       }, <?php echo $tempo_restante * 1000; ?>);
     </script>

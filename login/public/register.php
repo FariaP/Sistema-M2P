@@ -1,5 +1,9 @@
-<?php $ok = $_GET['ok'] ?? '';
-$err = $_GET['err'] ?? ''; ?>
+<?php
+session_start();
+$ok = $_SESSION['ok'] ?? '';
+$err = $_SESSION['err'] ?? '';
+unset($_SESSION['ok'], $_SESSION['err']);
+?>
 <!doctype html>
 <html lang="pt-br">
 
