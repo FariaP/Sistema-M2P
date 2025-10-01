@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 // só entra se estiver logado e for usuário comum
 session_regenerate_id(true);
 if (!isset($_SESSION['user']) || $_SESSION['user']['tipo'] !== 'user') {
