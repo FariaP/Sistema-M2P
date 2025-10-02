@@ -1,9 +1,19 @@
 <?php
+
+session_set_cookie_params([
+    'httponly' => true,
+    'secure' => true
+]);
+
 session_start();
+
+
 $ok = $_SESSION['ok'] ?? '';
 $err = $_SESSION['err'] ?? '';
 unset($_SESSION['ok'], $_SESSION['err']);
 ?>
+
+
 <!doctype html>
 <html lang="pt-br">
 

@@ -1,4 +1,10 @@
 <?php
+
+session_set_cookie_params([
+    'httponly' => true,
+    'secure' => true
+]);
+
 session_start();
 
 // Inicializa tentativas e bloqueio

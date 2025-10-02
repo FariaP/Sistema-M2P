@@ -1,5 +1,12 @@
 <?php
+// Configurações precisam vir antes do session_start
+session_set_cookie_params([
+    'httponly' => true,
+    'secure' => true
+]);
+
 session_start();
+
 
 // só entra se estiver logado e for admin
 session_regenerate_id(true);

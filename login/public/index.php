@@ -1,13 +1,22 @@
 <?php
+session_set_cookie_params([
+    'httponly' => true,
+    'secure' => true
+]);
+
 session_start();
+
 // Mensagens de feedback via sessão
 $ok = $_SESSION['mensagem_logout'] ?? $_SESSION['ok'] ?? '';
 $err = $_SESSION['err'] ?? '';
 unset($_SESSION['mensagem_logout'], $_SESSION['ok'], $_SESSION['err']);
+
+
 if (isset($_SESSION['user'])) {
   header('Location: listar_usuarios.php');
   exit;
 }
+
 // Verifica bloqueio
 $bloqueado = false;
 $tempo_restante = 0;
@@ -15,9 +24,14 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
   $bloqueado = true;
   $tempo_restante = $_SESSION['bloqueio_login'] - time();
 }
+
 ?>
+
+
+
 <!doctype html>
 <html lang="pt-br">
+
 
 <head>
   <meta charset="utf-8">
@@ -25,6 +39,7 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
   <title>Sistema de Login</title>
   <link rel="stylesheet" href="../assets/css/style.css">
 </head>
+
 
 <body>
   <div class="container">
@@ -66,6 +81,7 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
 
     // Máscara Placa (AAA-0A00 ou AAA-0000)
     const placaInput = document.querySelector('input[name="placa_hash"]');
+
     placaInput.addEventListener('input', function (e) {
       let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
       // Limita a 7 caracteres
@@ -75,6 +91,7 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
       e.target.value = v;
     });
   </script>
+  
   <?php if ($bloqueado): ?>
     <script>
       setTimeout(function () {
@@ -82,6 +99,7 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
       }, <?php echo $tempo_restante * 1000; ?>);
     </script>
   <?php endif; ?>
+
 </body>
 
 </html>

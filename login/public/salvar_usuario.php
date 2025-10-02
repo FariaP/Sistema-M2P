@@ -1,13 +1,23 @@
 <?php
+
 require_once __DIR__ . '/../app/config.php';
+
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   header('Location: index.php');
   exit;
 }
+
+session_set_cookie_params([
+    'httponly' => true,
+    'secure' => true
+]);
+
 $nome = trim($_POST['nome'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 $cpf_usuario = trim($_POST['cpf_usuario'] ?? '');
 $placa_hash = trim($_POST['placa_hash'] ?? '');
+
 
 if ($nome === '' || $telefone === '' || $cpf_usuario === '' || $placa_hash === '') {
   session_start();
