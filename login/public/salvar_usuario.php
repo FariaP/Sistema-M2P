@@ -36,8 +36,8 @@ try {
   $stmt->bindValue(':placa', $placa_hash);
   $stmt->execute();
   session_start();
-  $_SESSION['ok'] = 'Cadastro realizado! Faça login.';
-  header('Location: index.php');
+  // redireciona para a área do admin com mensagem de sucesso
+  header('Location: admin.php?success=' . urlencode('Usuário cadastrado com sucesso.'));
 } catch (PDOException $e) {
   if (($e->errorInfo[1] ?? 0) == 1062) {
     session_start();

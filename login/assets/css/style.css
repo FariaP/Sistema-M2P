@@ -41,7 +41,8 @@ body {
 
 .card {
     width: 100%;
-    max-width: 550px;
+    /* aumentado para comportar tabelas maiores sem barra de rolagem em desktop */
+    max-width: 1100px;
     background: var(--surface);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -100,11 +101,13 @@ h1 {
 }
 
 .button:hover {
-    background: var(--orange-dark);
+    /* sem efeito visual no hover */
+    background: var(--orange);
 }
 
 .button:active {
-    transform: translateY(1px);
+    /* sem efeito de clique (mantém posição) */
+    transform: none;
 }
 
 .helper {
@@ -169,4 +172,78 @@ header {
 
 header img {
     height: 34px;
+}
+
+.client-list {
+    margin: 20px 0;
+    overflow-x: auto;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-primary {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    margin: 0 4px;
+}
+
+.btn-edit {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-delete {
+    background: #DC2626;
+    color: white;
+}
+
+.btn-primary {
+    background: var(--orange);
+    color: white;
+    /* manter mesmo tamanho do botão de editar */
+    padding: 6px 12px;
+}
+
+/* remover efeitos de hover para botões (âncoras com classes) */
+.btn-primary:hover,
+.btn-edit:hover,
+.btn-delete:hover {
+    background: unset; /* será redefinido abaixo para manter o mesmo visual */
+    color: white;
+}
+
+.btn-primary:hover { background: var(--orange); }
+.btn-edit:hover { background: var(--primary); }
+.btn-delete:hover { background: #DC2626; }
+
+.actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-records {
+    text-align: center;
+    color: var(--muted);
+    margin: 20px 0;
+}
+
+.error {
+    color: #DC2626;
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* regra responsiva: em telas pequenas limita o card à largura do viewport */
+@media (max-width: 700px) {
+    .card {
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+    }
+    .table th,
+    .table td {
+        padding: 8px 10px;
+    }
 }
