@@ -43,6 +43,8 @@ body {
     width: 100%;
     /* aumentado para comportar tabelas maiores sem barra de rolagem em desktop */
     max-width: 1100px;
+    /* centralizar horizontalmente dentro do container */
+    margin: 10px auto;
     background: var(--surface);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -100,11 +102,6 @@ h1 {
     transition: transform .05s ease, background .2s ease;
 }
 
-.button:hover {
-    /* sem efeito visual no hover */
-    background: var(--orange);
-}
-
 .button:active {
     /* sem efeito de clique (mantém posição) */
     transform: none;
@@ -120,11 +117,9 @@ a {
     color: var(--primary);
     text-decoration: none;
     font-weight: 500;
+    text-align: center;
 }
 
-a:hover {
-    color: var(--orange);
-}
 
 .alert {
     background: #2C1810;
@@ -192,11 +187,15 @@ header img {
 .btn-edit {
     background: var(--primary);
     color: white;
+    margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .btn-delete {
     background: #DC2626;
     color: white;
+    cursor: pointer;
+    border: none;
 }
 
 .btn-primary {
@@ -210,13 +209,22 @@ header img {
 .btn-primary:hover,
 .btn-edit:hover,
 .btn-delete:hover {
-    background: unset; /* será redefinido abaixo para manter o mesmo visual */
+    background: unset;
+    /* será redefinido abaixo para manter o mesmo visual */
     color: white;
 }
 
-.btn-primary:hover { background: var(--orange); }
-.btn-edit:hover { background: var(--primary); }
-.btn-delete:hover { background: #DC2626; }
+.btn-primary:hover {
+    background: var(--orange);
+}
+
+.btn-edit:hover {
+    background: var(--primary);
+}
+
+.btn-delete:hover {
+    background: #DC2626;
+}
 
 .actions {
     text-align: center;
@@ -242,6 +250,7 @@ header img {
         padding: 20px;
         border-radius: 12px;
     }
+
     .table th,
     .table td {
         padding: 8px 10px;
