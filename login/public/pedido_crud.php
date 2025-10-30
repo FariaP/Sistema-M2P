@@ -38,12 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pedidoId = $pdo->lastInsertId();
 
                 $itStmt = $pdo->prepare('INSERT INTO item_servico (id_pedido, descricao, valor) VALUES (?, ?, ?)');
-                for ($i = 0; $i < count($descricoes); $i++) {
-                    $d = trim($descricoes[$i]);
+                $max = max(count($descricoes), count($valores));
+                $inserted = 0;
+                for ($i = 0; $i < $max; $i++) {
+                    $d = trim($descricoes[$i] ?? '');
                     $v = str_replace(',', '.', trim($valores[$i] ?? ''));
-                    if ($d === '' || $v === '')
-                        continue;
-                    $itStmt->execute([$pedidoId, $d, floatval($v)]);
+                    if ($d === '') {
+                        continue; // descrição vazia ignora
+                    }
+                    // se valor vier vazio, considera 0
+                    $num = $v === '' ? 0.0 : floatval($v);
+                    $itStmt->execute([$pedidoId, $d, $num]);
+                    $inserted++;
                 }
 
                 $pdo->commit();
@@ -73,12 +79,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // simplificação: remover todos os itens antigos e reinserir os enviados
                 $pdo->prepare('DELETE FROM item_servico WHERE id_pedido = ?')->execute([$id]);
                 $itStmt = $pdo->prepare('INSERT INTO item_servico (id_pedido, descricao, valor) VALUES (?, ?, ?)');
-                for ($i = 0; $i < count($descricoes); $i++) {
-                    $d = trim($descricoes[$i]);
+                $max = max(count($descricoes), count($valores));
+                $inserted = 0;
+                for ($i = 0; $i < $max; $i++) {
+                    $d = trim($descricoes[$i] ?? '');
                     $v = str_replace(',', '.', trim($valores[$i] ?? ''));
-                    if ($d === '' || $v === '')
-                        continue;
-                    $itStmt->execute([$id, $d, floatval($v)]);
+                    if ($d === '') {
+                        continue; // descrição vazia ignora
+                    }
+                    $num = $v === '' ? 0.0 : floatval($v);
+                    $itStmt->execute([$id, $d, $num]);
+                    $inserted++;
                 }
 
                 $pdo->commit();

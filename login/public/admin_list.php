@@ -73,8 +73,11 @@ $rows = $pdo->query('SELECT id,nome,telefone,cpf_usuario,placa,criado_em FROM us
                                         <td><?= htmlspecialchars($user['placa']) ?></td>
                                         <td><?= htmlspecialchars($user['criado_em']) ?></td>
                                         <td>
-                                            <a href="editar_usuario.php?id=<?= htmlspecialchars($user['id']) ?>" class="btn-edit">Editar</a>
-                                            <a href="excluir_usuario.php?id=<?= htmlspecialchars($user['id']) ?>" class="btn-delete" onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</a>
+                                            <a href="editar_usuario.php?id=<?= htmlspecialchars($user['id']) ?>"
+                                                class="btn-edit">Editar</a>
+                                            <a href="excluir_usuario.php?id=<?= htmlspecialchars($user['id']) ?>"
+                                                class="btn-delete"
+                                                onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -83,9 +86,11 @@ $rows = $pdo->query('SELECT id,nome,telefone,cpf_usuario,placa,criado_em FROM us
                     <?php endif; ?>
                 </div>
 
-                <div class="actions" style="margin-top:12px;">
+                <div class="actions" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
                     <a href="register.php" class="btn-primary">Cadastrar Novo Usuário</a>
-                    <a href="admin.php" class="button" style="display:inline-block;margin-left:10px;">Voltar</a>
+                    <a href="veiculo_crud.php" class="btn-primary">Gerenciar Veículos</a>
+                    <a href="pedido_crud.php" class="btn-primary">Gerenciar Pedidos</a>
+                    <a href="admin.php" class="button" style="display:inline-block;margin-left:auto;">Voltar</a>
                 </div>
             </div>
         </div>

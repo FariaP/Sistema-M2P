@@ -16,16 +16,13 @@
     function makeRow(desc = '', val = '') {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-                    <td><input type="text" name="descricao[]" value="${desc.replace(/"/g, '&quot;')}"></td>
-                    <td><input type="number" name="valor[]" step="0.01" value="${val}"></td>
-                    <td style="text-align:center;"><button type="button" class="action-btn delete" data-action="remove">\n +
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">\n +
-                            <path d=\"M3 6h18\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n +
-                            <path d=\"M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n +
-                            <path d=\"M10 11v6M14 11v6\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n +
-                            <path d=\"M9 6V4h6v2\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />\n +
-                        </svg>\n +
-                    </button></td>`;
+            <td><input type="text" name="descricao[]" value="${desc.replace(/"/g, '&quot;')}"></td>
+            <td><input type="number" name="valor[]" step="0.01" value="${val}"></td>
+            <td style="text-align:center;">
+                <button type="button" class="action-btn delete" data-action="remove">
+                    Excluir
+                </button>
+            </td>`;
         itemsBody.appendChild(tr);
         tr.querySelectorAll('input').forEach(i => i.addEventListener('input', calcTotal));
         tr.querySelector('button[data-action="remove"]').addEventListener('click', function () { tr.remove(); calcTotal(); });
