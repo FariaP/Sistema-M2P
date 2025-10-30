@@ -47,3 +47,17 @@
 .form-row .input {
     flex: 1
 }
+
+/* pedido_crud */
+.items-table input[type="number"] {
+    width: 120px;
+}
+
+.items-table input[type="text"] {
+    width: 100%;
+}
+
+.total-row {
+    font-weight: 700;
+    text-align: right;
+}
