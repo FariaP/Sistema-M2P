@@ -12,10 +12,10 @@ $err = $_SESSION['err'] ?? '';
 unset($_SESSION['mensagem_logout'], $_SESSION['ok'], $_SESSION['err']);
 
 
-if (isset($_SESSION['user'])) {
-  header('Location: listar_usuarios.php');
-  exit;
-}
+// if (isset($_SESSION['user'])) {
+//   header('Location: listar_usuarios.php');
+//   exit;
+// }
 
 // Verifica bloqueio
 $bloqueado = false;

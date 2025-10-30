@@ -89,7 +89,7 @@ if (isset($_GET['edit'])) {
 </head>
 
 <body>
-    <div class="container" style="flex-direction:column;align-items:stretch;min-height:100vh;">
+    <div class="container" style="flex-direction:column;align-items:stretch;min-height:0vh;">
         <div class="user-header">
             <img src="../assets/logo.png" alt="logo" style="height:38px;">
             <span class="brand">AutoTech</span>

@@ -104,6 +104,8 @@ $adminName = $_SESSION['user']['nome'] ?? $_SESSION['user']['cpf_usuario'] ?? 'A
                 <a href="admin_list.php" class="btn-primary">Gerenciar Usuários (Editar / Excluir)</a>
                 <a href="register.php" class="btn-primary" style="display:inline-block;margin-left:10px;">Cadastrar Novo
                     Usuário</a>
+                <a href="veiculo_crud.php" class="btn-primary" style="display:inline-block;margin-left:10px;">Cadastrar Novo Veiculo</a>
+                <a href="pedido_crud.php" class="btn-primary" style="display:inline-block;margin-left:10px;">Pedidos</a>
             </div>
         </div>
     </div>

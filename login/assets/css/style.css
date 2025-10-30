@@ -23,6 +23,7 @@ body {
 
 body {
     margin: 0;
+    /* padding: 0 !important; */
     font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial;
     color: var(--text);
     background: var(--bg);
@@ -34,6 +35,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 40px 16px;
+    padding-top: 0px;
     background:
         radial-gradient(700px 400px at 10% 10%, rgba(59, 175, 218, .12), transparent),
         radial-gradient(700px 400px at 90% 90%, rgba(255, 107, 53, .08), transparent);
@@ -51,6 +53,7 @@ body {
     padding: 28px 26px 22px;
     border: 1px solid var(--border);
     overflow: hidden;
+    /* min-height:100vh; */
 }
 
 .card img {
