@@ -60,7 +60,7 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
       <form class="form" method="post" action="login.php" autocomplete="off">
         <input class="input" type="text" name="cpf_usuario" placeholder="CPF" required minlength="3" maxlength="80"
           <?php echo $bloqueado ? 'disabled' : ''; ?>>
-        <input class="input" type="text" name="placa_hash" placeholder="Placa" required minlength="4" maxlength="64"
+        <input class="input" type="text" name="senha_hash" placeholder="Telefone" required minlength="4" maxlength="64"
           <?php echo $bloqueado ? 'disabled' : ''; ?>>
         <button class="button" type="submit" <?php echo $bloqueado ? 'disabled' : ''; ?>>ENTRAR</button>
       </form>
@@ -80,14 +80,16 @@ if (isset($_SESSION['bloqueio_login']) && $_SESSION['bloqueio_login'] > time()) 
     });
 
     // Máscara Placa (AAA-0A00 ou AAA-0000)
-    const placaInput = document.querySelector('input[name="placa_hash"]');
+    const senhaInput = document.querySelector('input[name="senha_hash"]');
 
-    placaInput.addEventListener('input', function (e) {
-      let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      // Limita a 7 caracteres
-      v = v.slice(0, 7);
-      // Formatação AAA-0A00 ou AAA-0000
-      if (v.length > 3) v = v.slice(0, 3) + '-' + v.slice(3);
+    // Máscara telefone
+    senhaInput.addEventListener('input', function (e) {
+      let v = e.target.value.replace(/\D/g, '');
+      if (v.length > 11) v = v.slice(0, 11);
+      if (v.length > 0) v = '(' + v;
+      if (v.length > 3) v = v.slice(0, 3) + ') ' + v.slice(3);
+      if (v.length > 10) v = v.slice(0, 10) + '-' + v.slice(10);
+      else if (v.length > 9) v = v.slice(0, 9) + '-' + v.slice(9);
       e.target.value = v;
     });
   </script>

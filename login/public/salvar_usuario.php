@@ -28,12 +28,14 @@ if ($nome === '' || $telefone === '' || $cpf_usuario === '' || $placa_hash === '
 
 try {
   $hash = password_hash($placa_hash, PASSWORD_BCRYPT);
-  $stmt = $pdo->prepare('INSERT INTO usuarios (nome, telefone, cpf_usuario, placa_hash, placa) VALUES (:nome,:telefone,:cpf_usuario,:hash, :placa)');
+  $hash_senha = password_hash($telefone, PASSWORD_BCRYPT);
+  $stmt = $pdo->prepare('INSERT INTO usuarios (nome, telefone, cpf_usuario, placa_hash, placa, senha_hash) VALUES (:nome,:telefone,:cpf_usuario,:hash, :placa, :senha_hash)');
   $stmt->bindValue(':nome', $nome);
   $stmt->bindValue(':telefone', $telefone);
   $stmt->bindValue(':cpf_usuario', $cpf_usuario);
   $stmt->bindValue(':hash', $hash);
   $stmt->bindValue(':placa', $placa_hash);
+  $stmt->bindValue(':senha_hash', $hash_senha);
   $stmt->execute();
   session_start();
   // redireciona para a área do admin com mensagem de sucesso

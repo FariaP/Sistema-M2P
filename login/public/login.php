@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $cpf = trim($_POST['cpf_usuario'] ?? '');
-$senha = trim($_POST['placa_hash'] ?? '');
+$senha = trim($_POST['senha_hash'] ?? '');
 
 
 
@@ -49,13 +49,13 @@ if ($cpf === '' || $senha === '') {
 
 try {
     // busca usuário
-    $stmt = $pdo->prepare("SELECT id, cpf_usuario, placa_hash, tipo FROM usuarios WHERE cpf_usuario = :cpf LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, cpf_usuario, senha_hash, tipo FROM usuarios WHERE cpf_usuario = :cpf LIMIT 1");
     $stmt->bindValue(':cpf', $cpf);
     $stmt->execute();
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
-    if ($usuario && password_verify($senha, $usuario['placa_hash'])) {
+    if ($usuario && password_verify($senha, $usuario['senha_hash'])) {
         // Login bem-sucedido: zera tentativas
         $_SESSION['tentativas'] = 0;
         $_SESSION['bloqueio_login'] = 0;
