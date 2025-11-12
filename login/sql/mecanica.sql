@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 11/11/2025 às 18:45
+-- Tempo de geração: 12/11/2025 às 18:46
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -31,8 +31,18 @@ CREATE TABLE `item_servico` (
   `id` int(11) NOT NULL,
   `id_pedido` int(11) NOT NULL,
   `descricao` text NOT NULL,
-  `valor` decimal(10,2) NOT NULL
+  `valor` decimal(10,2) NOT NULL,
+  `status_item` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `item_servico`
+--
+
+INSERT INTO `item_servico` (`id`, `id_pedido`, `descricao`, `valor`, `status_item`) VALUES
+(1, 4, 'teste', 100.00, NULL),
+(3, 5, 'teste', 100.00, 'Em andamento');
+
 
 -- --------------------------------------------------------
 
@@ -47,6 +57,14 @@ CREATE TABLE `pedido_servico` (
   `observacoes` text DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'Em andamento'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `pedido_servico`
+--
+
+INSERT INTO `pedido_servico` (`id`, `id_veiculo`, `data_criacao`, `observacoes`, `status`) VALUES
+(4, 6, '2025-11-12 12:22:18', 'teste', 'Em andamento'),
+(5, 6, '2025-11-12 17:38:17', NULL, 'Aguardando');
 
 -- --------------------------------------------------------
 
@@ -89,6 +107,13 @@ CREATE TABLE `veiculo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Despejando dados para a tabela `veiculo`
+--
+
+INSERT INTO `veiculo` (`id`, `cpf_usuario`, `placa`, `modelo`, `ano`) VALUES
+(6, '222.222.222-22', 'ABC-1234', 'Fiat Marea', 2002);
+
+--
 -- Índices para tabelas despejadas
 --
 
@@ -128,13 +153,13 @@ ALTER TABLE `veiculo`
 -- AUTO_INCREMENT de tabela `item_servico`
 --
 ALTER TABLE `item_servico`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `pedido_servico`
 --
 ALTER TABLE `pedido_servico`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
@@ -146,7 +171,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de tabela `veiculo`
 --
 ALTER TABLE `veiculo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Restrições para tabelas despejadas

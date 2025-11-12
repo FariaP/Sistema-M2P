@@ -188,6 +188,22 @@ if (isset($_GET['edit'])) {
         </div>
 
     </div>
+    
+    <script>
+    // Máscara Placa (AAA-0A00 ou AAA-0000)
+    const placaInput = document.querySelector('input[name="placa"]');
+    placaInput.addEventListener('input', function (e) {
+        
+        let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        // Limita a 7 caracteres
+        v = v.slice(0, 7);
+        // Formatação AAA-0A00 ou AAA-0000
+        if (v.length > 3) v = v.slice(0, 3) + '-' + v.slice(3);
+        e.target.value = v;
+    
+    });
+    </script>
+
 </body>
 
 </html>

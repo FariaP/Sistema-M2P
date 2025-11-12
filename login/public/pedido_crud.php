@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $status = trim($_POST['status'] ?? 'Em andamento');
         $descricoes = $_POST['descricao'] ?? [];
         $valores = $_POST['valor'] ?? [];
+        $status_itens = $_POST['status_item'] ?? [];
 
         if ($id_veiculo <= 0) {
             $errors[] = 'Veículo é obrigatório.';
@@ -37,18 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$id_veiculo, $observacoes ?: null, $status]);
                 $pedidoId = $pdo->lastInsertId();
 
-                $itStmt = $pdo->prepare('INSERT INTO item_servico (id_pedido, descricao, valor) VALUES (?, ?, ?)');
-                $max = max(count($descricoes), count($valores));
+                $itStmt = $pdo->prepare('INSERT INTO item_servico (id_pedido, descricao, valor, status_item) VALUES (?, ?, ?, ?)');
+                $max = max(count($descricoes), count($valores), count($status_itens));
                 $inserted = 0;
                 for ($i = 0; $i < $max; $i++) {
                     $d = trim($descricoes[$i] ?? '');
                     $v = str_replace(',', '.', trim($valores[$i] ?? ''));
+                    $s = $status_itens[$i] ?? 'Aguardando';
                     if ($d === '') {
                         continue; // descrição vazia ignora
                     }
                     // se valor vier vazio, considera 0
                     $num = $v === '' ? 0.0 : floatval($v);
-                    $itStmt->execute([$pedidoId, $d, $num]);
+                    $itStmt->execute([$pedidoId, $d, $num, $s]);
                     $inserted++;
                 }
 
@@ -67,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $status = trim($_POST['status'] ?? 'Em andamento');
         $descricoes = $_POST['descricao'] ?? [];
         $valores = $_POST['valor'] ?? [];
+        $status_itens = $_POST['status_item'] ?? [];
 
         if ($id <= 0 || $id_veiculo <= 0) {
             $errors[] = 'Dados inválidos para atualização.';
@@ -78,17 +81,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // simplificação: remover todos os itens antigos e reinserir os enviados
                 $pdo->prepare('DELETE FROM item_servico WHERE id_pedido = ?')->execute([$id]);
-                $itStmt = $pdo->prepare('INSERT INTO item_servico (id_pedido, descricao, valor) VALUES (?, ?, ?)');
-                $max = max(count($descricoes), count($valores));
+                $itStmt = $pdo->prepare('INSERT INTO item_servico (id_pedido, descricao, valor, status_item) VALUES (?, ?, ?, ?)');
+                $max = max(count($descricoes), count($valores), count($status_itens));
                 $inserted = 0;
                 for ($i = 0; $i < $max; $i++) {
                     $d = trim($descricoes[$i] ?? '');
                     $v = str_replace(',', '.', trim($valores[$i] ?? ''));
+                    $s = $status_itens[$i] ?? 'Aguardando';
                     if ($d === '') {
                         continue; // descrição vazia ignora
                     }
                     $num = $v === '' ? 0.0 : floatval($v);
-                    $itStmt->execute([$id, $d, $num]);
+                    $itStmt->execute([$id, $d, $num, $s]);
                     $inserted++;
                 }
 
@@ -204,7 +208,7 @@ if (isset($_GET['edit'])) {
                     <label>
                         Status
                         <select name="status">
-                            <?php $statuses = ['Em andamento', 'Concluído', 'Pausado', 'Cancelado']; ?>
+                            <?php $statuses = ['Aguardando', 'Em andamento', 'Concluído', 'Pausado', 'Cancelado']; ?>
                             <?php foreach ($statuses as $s): ?>
                                 <option value="<?= htmlspecialchars($s) ?>" <?= ($edit && $edit['status'] === $s) ? 'selected' : '' ?>><?= htmlspecialchars($s) ?></option>
                             <?php endforeach; ?>
@@ -222,19 +226,35 @@ if (isset($_GET['edit'])) {
                 <table class="table items-table">
                     <thead>
                         <tr>
-                            <th style="width:60%;">Descrição</th>
-                            <th style="width:140px;text-align:right;">Valor (R$)</th>
-                            <th style="width:80px;text-align:center;">Ação</th>
+                            <th style="width:40%;">Descrição</th>
+                            <th style="width:15%;text-align:right;">Valor (R$)</th>
+                            <th style="width:15%;text-align:center;">Status</th>
+                            <th style="text-align:center;">Ação</th>
                         </tr>
                     </thead>
                     <tbody id="items-body">
                         <?php if ($edit && $itens): ?>
                             <?php foreach ($itens as $it): ?>
                                 <tr data-item-id="<?= intval($it['id']) ?>">
-                                    <td><input type="text" name="descricao[]" value="<?= htmlspecialchars($it['descricao']) ?>">
+                                    <td>
+                                        <input type="text" name="descricao[]" value="<?= htmlspecialchars($it['descricao']) ?>">
                                     </td>
-                                    <td><input type="number" name="valor[]" step="0.01"
-                                            value="<?= number_format($it['valor'], 2, '.', '') ?>"></td>
+                                    
+                                    <td>
+                                        <input type="number" name="valor[]" step="0.01"
+                                            value="<?= number_format($it['valor'], 2, '.', '') ?>">
+                                    </td>
+                                    
+                                    <td style="text-align:center;">
+                                        <select name="status_item[]" style="width:100%;">
+                                            <option value="Aguardando" <?= (isset($it['status_item']) && $it['status_item'] === 'Aguardando') ? 'selected' : '' ?>>Aguardando</option>
+                                            <option value="Em andamento" <?= (isset($it['status_item']) && $it['status_item'] === 'Em andamento') ? 'selected' : '' ?>>Em andamento</option>
+                                            <option value="Concluído" <?= (isset($it['status_item']) && $it['status_item'] === 'Concluído') ? 'selected' : '' ?>>Concluído</option>
+                                            <option value="Pausado" <?= (isset($it['status_item']) && $it['status_item'] === 'Pausado') ? 'selected' : '' ?>>Pausado</option>
+                                            <option value="Cancelado" <?= (isset($it['status_item']) && $it['status_item'] === 'Cancelado') ? 'selected' : '' ?>>Cancelado</option>
+                                        </select>
+                                    </td>
+
                                     <td style="text-align:center;">
                                         <button type="button" class="action-btn delete" data-action="remove-existing"
                                             data-item-id="<?= intval($it['id']) ?>">
@@ -258,6 +278,7 @@ if (isset($_GET['edit'])) {
                         <tr>
                             <td style="text-align:right;">Total</td>
                             <td style="text-align:right;padding-right:12px;" id="total-cell">R$ 0.00</td>
+                            <td></td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -319,7 +340,107 @@ if (isset($_GET['edit'])) {
             </table>
         </div>
     </div>
-    <script src="js/function_pedidos.js"></script>
+    <script>
+    // js/function_pedidos.js
+    document.addEventListener('DOMContentLoaded', function() {
+        const itemsBody = document.getElementById('items-body');
+        const addItemBtn = document.getElementById('add-item');
+        const pedidoForm = document.getElementById('pedido-form');
+        
+        // Adicionar novo item
+        if (addItemBtn) {
+            addItemBtn.addEventListener('click', function() {
+                const newRow = document.createElement('tr');
+                
+                const statusOptions = ['Aguardando', 'Em andamento', 'Concluído', 'Pausado', 'Cancelado'];
+                let statusSelect = '<select name="status_item[]" style="width:100%;">';
+                statusOptions.forEach(option => {
+                    statusSelect += `<option value="${option}">${option}</option>`;
+                });
+                statusSelect += '</select>';
+                
+                newRow.innerHTML = `
+                    <td><input type="text" name="descricao[]"></td>
+                    <td><input type="number" name="valor[]" step="0.01"></td>
+                    <td style="text-align:center;">${statusSelect}</td>
+                    <td style="text-align:center;">
+                        <button type="button" class="action-btn delete" data-action="remove">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                                <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 6V4h6v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                
+                itemsBody.appendChild(newRow);
+                attachRemoveListeners();
+            });
+        }
+        
+        // Remover item
+        function attachRemoveListeners() {
+            document.querySelectorAll('[data-action="remove"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('tr').remove();
+                    calculateTotal();
+                });
+            });
+            
+            // Para itens existentes (que têm data-item-id)
+            document.querySelectorAll('[data-action="remove-existing"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-item-id');
+                    if (confirm('Excluir este item?')) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.style.display = 'none';
+                        
+                        const actionInput = document.createElement('input');
+                        actionInput.name = 'action';
+                        actionInput.value = 'delete_item';
+                        
+                        const idInput = document.createElement('input');
+                        idInput.name = 'id';
+                        idInput.value = itemId;
+                        
+                        form.appendChild(actionInput);
+                        form.appendChild(idInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        }
+        
+        // Calcular total
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('input[name="valor[]"]').forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                total += value;
+            });
+            
+            const totalCell = document.getElementById('total-cell');
+            if (totalCell) {
+                totalCell.textContent = 'R$ ' + total.toFixed(2);
+            }
+        }
+        
+        // Event listeners para cálculo automático do total
+        document.addEventListener('input', function(e) {
+            if (e.target.name === 'valor[]') {
+                calculateTotal();
+            }
+        });
+        
+        // Inicializar
+        attachRemoveListeners();
+        calculateTotal();
+    });
+    </script>
 </body>
 
 </html>
