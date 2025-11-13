@@ -1,4 +1,3 @@
-
 (function () {
     const itemsBody = document.getElementById('items-body');
     const addItemBtn = document.getElementById('add-item');
@@ -10,7 +9,9 @@
             const v = parseFloat(i.value.replace(',', '.')) || 0;
             total += v;
         });
-        totalCell.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+        if (totalCell) {
+            totalCell.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+        }
     }
 
     function makeRow(desc = '', val = '') {
@@ -18,6 +19,14 @@
         tr.innerHTML = `
             <td><input type="text" name="descricao[]" value="${desc.replace(/"/g, '&quot;')}"></td>
             <td><input type="number" name="valor[]" step="0.01" value="${val}"></td>
+            <td>
+                <select name="status_item[]">
+                    <option value="Aguardando">Aguardando</option>
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Concluído">Concluído</option>
+                    <option value="Pausado">Pausado</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select></td>
             <td style="text-align:center;">
                 <button type="button" class="action-btn delete" data-action="remove">
                     Excluir
@@ -25,11 +34,17 @@
             </td>`;
         itemsBody.appendChild(tr);
         tr.querySelectorAll('input').forEach(i => i.addEventListener('input', calcTotal));
-        tr.querySelector('button[data-action="remove"]').addEventListener('click', function () { tr.remove(); calcTotal(); });
+        tr.querySelector('button[data-action="remove"]').addEventListener('click', function () { 
+            tr.remove(); 
+            calcTotal(); 
+        });
         calcTotal();
     }
 
-    addItemBtn.addEventListener('click', function () { makeRow('', ''); });
+    // ✅ só adiciona o listener se o botão existir (ou seja, se for admin)
+    if (addItemBtn) {
+        addItemBtn.addEventListener('click', function () { makeRow('', ''); });
+    }
 
     // attach listeners to existing inputs
     document.querySelectorAll('input[name="valor[]"]').forEach(i => i.addEventListener('input', calcTotal));

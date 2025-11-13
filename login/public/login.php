@@ -69,7 +69,7 @@ try {
         if ($usuario['tipo'] === 'admin') {
             header("Location: admin.php");
         } else {
-            header("Location: user.php");
+            header("Location: pedido_crud.php");
         }
         exit;
     } else {

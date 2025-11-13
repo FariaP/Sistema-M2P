@@ -33,7 +33,7 @@ body {
     min-height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    /* justify-content: center; */
     padding: 40px 16px;
     padding-top: 0px;
     background:
@@ -258,4 +258,13 @@ header img {
     .table td {
         padding: 8px 10px;
     }
+}
+
+input[disabled],
+select[disabled],
+textarea[disabled] {
+    opacity: 1 !important;              /* remove a transparência */
+    background-color: #fff !important;  /* cor de fundo normal */
+    color: #000 !important;             /* texto normal */
+    /* cursor: not-allowed;                mostra que está bloqueado */
 }
