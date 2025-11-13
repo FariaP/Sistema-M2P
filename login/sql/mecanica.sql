@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 12/11/2025 às 18:46
+-- Tempo de geração: 13/11/2025 às 17:49
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -42,7 +42,6 @@ CREATE TABLE `item_servico` (
 INSERT INTO `item_servico` (`id`, `id_pedido`, `descricao`, `valor`, `status_item`) VALUES
 (1, 4, 'teste', 100.00, NULL),
 (3, 5, 'teste', 100.00, 'Em andamento');
-
 
 -- --------------------------------------------------------
 
