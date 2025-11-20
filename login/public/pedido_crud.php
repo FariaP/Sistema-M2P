@@ -170,6 +170,7 @@ if (isset($_GET['edit'])) {
             <img src="../assets/logo.png" alt="logo" style="height:38px;">
             <span class="brand">AutoTech</span>
             <span style="font-size:0.95em;color:var(--muted);margin-left:8px;">Pedidos de Serviço</span>
+            <a href="admin.php" class="button" style="margin-left:10px;">← Voltar</a>
             <a href="logout.php" class="button logout">⤴ Sair</a>
         </div>
 

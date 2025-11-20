@@ -65,11 +65,48 @@ try {
             'cpf_usuario' => $usuario['cpf_usuario'],
             'tipo' => $usuario['tipo']
         ];
+        // Buscar veículos associados ao CPF do usuário e popular sessão
+        try {
+            $vstmt = $pdo->prepare('SELECT id, placa, modelo, ano FROM veiculo WHERE cpf_usuario = :cpf ORDER BY id DESC');
+            $vstmt->bindValue(':cpf', $usuario['cpf_usuario']);
+            $vstmt->execute();
+            $veiculos = $vstmt->fetchAll(PDO::FETCH_ASSOC);
+            $_SESSION['user']['veiculos'] = $veiculos;
+
+            if (count($veiculos) === 1) {
+                // se houver apenas um veículo, seleciona automaticamente
+                $v = $veiculos[0];
+                $_SESSION['user']['veiculo_id'] = intval($v['id']);
+                $_SESSION['user']['placa'] = $v['placa'] ?? null;
+                $modelo = $v['modelo'] ?? '';
+                $ano = $v['ano'] ? ' ' . $v['ano'] : '';
+                $_SESSION['user']['carro'] = trim($modelo . $ano);
+            } elseif (count($veiculos) > 1) {
+                // se houver vários, não escolhe nenhum por padrão (user.php permitirá a escolha)
+                $_SESSION['user']['veiculo_id'] = $_SESSION['user']['veiculo_id'] ?? null;
+                // opcional: preencher placa/carro com o primeiro para exibição inicial
+                $first = $veiculos[0];
+                $_SESSION['user']['placa'] = $first['placa'] ?? null;
+                $_SESSION['user']['carro'] = trim(($first['modelo'] ?? '') . ($first['ano'] ? ' ' . $first['ano'] : ''));
+            } else {
+                // sem veículos
+                $_SESSION['user']['veiculo_id'] = null;
+                $_SESSION['user']['placa'] = null;
+                $_SESSION['user']['carro'] = null;
+            }
+        } catch (PDOException $e) {
+            // não interrompe o login por causa de falha na leitura do veículo
+            $_SESSION['user']['veiculos'] = [];
+            $_SESSION['user']['veiculo_id'] = null;
+            $_SESSION['user']['placa'] = null;
+            $_SESSION['user']['carro'] = null;
+        }
+
         // redireciona de acordo com o tipo
         if ($usuario['tipo'] === 'admin') {
             header("Location: admin.php");
         } else {
-            header("Location: pedido_crud.php");
+            header("Location: user.php");
         }
         exit;
     } else {

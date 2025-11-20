@@ -94,6 +94,7 @@ if (isset($_GET['edit'])) {
             <img src="../assets/logo.png" alt="logo" style="height:38px;">
             <span class="brand">AutoTech</span>
             <span style="font-size:0.95em;color:var(--muted);margin-left:8px;">Cadastro de Veículos</span>
+            <a href="admin.php" class="button" style="width:auto;padding:8px 18px;font-size:1em;margin-left:10px;">← Voltar</a>
             <a href="logout.php" class="button logout" style="width:auto;padding:8px 18px;font-size:1em;">⤴ Sair</a>
         </div>
 

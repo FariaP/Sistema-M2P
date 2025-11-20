@@ -14,30 +14,169 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['tipo'] !== 'user') {
     exit;
 }
 
-// Simulação de dados do usuário e serviços (ajuste para dados reais do seu sistema)
+// carregar configuração do banco para buscar veículos
+require_once __DIR__ . '/../app/config.php';
+
+// verificar se o usuário tem veículos cadastrados
+$cpfSess = $_SESSION['user']['cpf_usuario'] ?? null;
+$veiculos = [];
+if ($cpfSess) {
+    try {
+        $vstmt = $pdo->prepare('SELECT id, placa, modelo, ano FROM veiculo WHERE cpf_usuario = :cpf ORDER BY id DESC');
+        $vstmt->bindValue(':cpf', $cpfSess);
+        $vstmt->execute();
+        $veiculos = $vstmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $veiculos = [];
+    }
+}
+
+// Se não houver veículos cadastrados, mostrar tela inicial informando isso
+if (empty($veiculos)) {
+    ?>
+    <!doctype html>
+    <html lang="pt-br">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Área do Cliente - AutoTech</title>
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="../assets/css/style_user.css">
+    </head>
+    <body>
+        <div class="container" style="flex-direction:column;align-items:stretch;min-height:100vh;">
+            <div class="user-header">
+                <img src="../assets/logo.png" alt="logo" style="height:38px;">
+                <span class="brand">AutoTech</span>
+                <span style="font-size:0.95em;color:var(--muted);margin-left:8px;">Área do Cliente</span>
+                <a href="logout.php" class="button logout" style="width:auto;padding:8px 18px;font-size:1em;">⤴ Sair</a>
+            </div>
+            <div class="card" style="margin:24px auto;max-width:720px;text-align:center;">
+                <h2>Nenhum veículo cadastrado</h2>
+                <p style="color:var(--muted);">Não encontramos veículos vinculados ao seu CPF. Para agendar um serviço, por favor, contate a administração ou cadastre um veículo através do suporte.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
+// Determinar veículo escolhido por: query `?veiculo=ID`, sessão `veiculo_id`, ou pela placa em sessão
+$selected = null;
+// 1) se foi passado ?veiculo=ID (seleção rápida)
+if (isset($_GET['veiculo'])) {
+    $vid = intval($_GET['veiculo']);
+    foreach ($veiculos as $v) {
+        if (intval($v['id']) === $vid) {
+            $selected = $v;
+            $_SESSION['user']['veiculo_id'] = $v['id'];
+            break;
+        }
+    }
+}
+
+// 2) se não veio pela query, tentar por veiculo_id em sessão
+if (!$selected && isset($_SESSION['user']['veiculo_id'])) {
+    $vid = intval($_SESSION['user']['veiculo_id']);
+    foreach ($veiculos as $v) {
+        if (intval($v['id']) === $vid) {
+            $selected = $v;
+            break;
+        }
+    }
+}
+
+// 3) se ainda não tiver, tentar localizar por placa armazenada em sessão
+if (!$selected && !empty($_SESSION['user']['placa'])) {
+    $sessPlaca = trim($_SESSION['user']['placa']);
+    foreach ($veiculos as $v) {
+        if (strcasecmp(trim($v['placa']), $sessPlaca) === 0) {
+            $selected = $v;
+            $_SESSION['user']['veiculo_id'] = $v['id'];
+            break;
+        }
+    }
+}
+
+// 4) se houver apenas 1 veículo, escolher por padrão
+if (!$selected && count($veiculos) === 1) {
+    $selected = $veiculos[0];
+    $_SESSION['user']['veiculo_id'] = $selected['id'];
+}
+
+// Construir dados do usuário/veículo para exibição (substitui o carro genérico)
+$placaExib = $selected['placa'] ?? ($_SESSION['user']['placa'] ?? 'ABC-1234');
+$carroExib = $selected ? trim(($selected['modelo'] ?? '') . ($selected['ano'] ? ' ' . $selected['ano'] : '')) : ($_SESSION['user']['carro'] ?? 'Veículo não especificado');
+
 $user = [
     'nome' => $_SESSION['user']['nome'] ?? 'Usuário',
-    'placa' => $_SESSION['user']['placa'] ?? 'ABC-1234',
-    'carro' => 'Honda Civic 2020',
+    'placa' => $placaExib,
+    'carro' => $carroExib,
     'km' => '45.000 km',
     'status' => 'Em Procedimento',
     'previsao' => '15/01/2025',
     'atualizacao' => '14/01/2025 14:30',
 ];
+
 $servicos = [
     ['nome' => 'Troca de óleo', 'obrigatorio' => true, 'feito' => true],
     ['nome' => 'Filtro de ar', 'obrigatorio' => true, 'feito' => false],
     ['nome' => 'Revisão de freios', 'obrigatorio' => true, 'feito' => false],
     ['nome' => 'Alinhamento', 'obrigatorio' => false, 'feito' => false],
 ];
+
 $orcamento = [
     ['nome' => 'Troca de óleo + filtro', 'valor' => 120, 'obrigatorio' => true],
     ['nome' => 'Pastilhas de freio', 'valor' => 280, 'obrigatorio' => true],
     ['nome' => 'Alinhamento', 'valor' => 80, 'obrigatorio' => false],
 ];
+
+// Tentar carregar último pedido e itens do veículo para preencher progresso/orçamento
 $total = 0;
-foreach ($orcamento as $item)
-    $total += $item['valor'];
+$ultimoPedido = null;
+$itensPedido = [];
+if (!empty($selected['id'])) {
+    try {
+        $pstmt = $pdo->prepare('SELECT * FROM pedido_servico WHERE id_veiculo = :id_veiculo ORDER BY data_criacao DESC LIMIT 1');
+        $pstmt->bindValue(':id_veiculo', $selected['id'], PDO::PARAM_INT);
+        $pstmt->execute();
+        $ultimoPedido = $pstmt->fetch(PDO::FETCH_ASSOC);
+        if ($ultimoPedido) {
+            $ipstmt = $pdo->prepare('SELECT * FROM item_servico WHERE id_pedido = :id_pedido');
+            $ipstmt->bindValue(':id_pedido', $ultimoPedido['id'], PDO::PARAM_INT);
+            $ipstmt->execute();
+            $itensPedido = $ipstmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } catch (Exception $e) {
+        // em caso de erro, manter os dados estáticos
+        $ultimoPedido = null;
+        $itensPedido = [];
+    }
+}
+
+if ($itensPedido) {
+    // construir servicos/orcamento a partir dos itens do pedido
+    $servicos = [];
+    $orcamento = [];
+    foreach ($itensPedido as $it) {
+        $statusItem = $it['status_item'] ?? '';
+        $feito = false;
+        $sNorm = mb_strtolower(trim($statusItem));
+        if ($sNorm === 'concluido' || $sNorm === 'concluído' || $sNorm === 'finalizado' || $sNorm === 'feito') {
+            $feito = true;
+        }
+        $servicos[] = ['nome' => $it['descricao'], 'obrigatorio' => true, 'feito' => $feito];
+        $orcamento[] = ['nome' => $it['descricao'], 'valor' => floatval($it['valor']), 'obrigatorio' => true];
+        $total += floatval($it['valor']);
+    }
+    // atualizar status/previsao/atualizacao com dados do pedido
+    $user['status'] = $ultimoPedido['status'] ?? $user['status'];
+    $user['atualizacao'] = $ultimoPedido['data_criacao'] ?? $user['atualizacao'];
+    // previsao não existe na tabela; manter placeholder
+} else {
+    foreach ($orcamento as $item) $total += $item['valor'];
+}
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -64,6 +203,22 @@ foreach ($orcamento as $item)
                 <span style="font-size:1.2em;">🚗 <b><?= htmlspecialchars($user['placa']) ?></b></span>
                 <span class="status-badge"><?= htmlspecialchars($user['status']) ?></span>
             </div>
+            <?php if (count($veiculos) > 1): ?>
+                <ul class="vehicle-list">
+                    <?php foreach ($veiculos as $v):
+                        $isActive = (isset($selected) && $selected && intval($selected['id']) === intval($v['id']));
+                        $label = htmlspecialchars($v['placa']);
+                        $sub = htmlspecialchars(trim(($v['modelo'] ?? '') . ($v['ano'] ? ' ' . $v['ano'] : '')));
+                    ?>
+                        <li>
+                            <a href="?veiculo=<?= intval($v['id']) ?>" class="btn-vehicle<?= $isActive ? ' active' : '' ?>">
+                                <strong><?= $label ?></strong>
+                                <span style="margin-left:8px;font-size:0.85em;color:var(--muted);"><?= $sub ?></span>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
             <div style="color:var(--muted);margin-bottom:6px;">
                 <?= htmlspecialchars($user['carro']) ?> • <?= htmlspecialchars($user['km']) ?>
             </div>

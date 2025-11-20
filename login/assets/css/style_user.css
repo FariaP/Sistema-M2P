@@ -96,6 +96,35 @@
     min-width: 100% !important;
 }
 
+/* Lista compacta de veículos no card do usuário */
+.vehicle-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.vehicle-list li {
+    display: inline-block;
+}
+.btn-vehicle {
+    padding: 6px 10px;
+    font-size: 0.9em;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-block;
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: transparent;
+}
+.btn-vehicle.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
 
 @media (max-width: 900px) {
     .cards-container .card {
