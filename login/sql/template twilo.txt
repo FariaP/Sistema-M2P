@@ -1,0 +1,3 @@
+O serviço #{{1}} para o veículo de placa {{2}} foi finalizado com sucesso.
+Horário: {{3}}
+Aguardamos sua visita para retirada do veículo.

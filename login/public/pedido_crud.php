@@ -16,6 +16,12 @@ $isAdmin = ($_SESSION['user']['tipo'] === 'admin');
 $readonly = $isAdmin ? '' : 'disabled';
 
 require_once __DIR__ . '/../app/config.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+                        $sid  = "ACf85723c28661513be923873c69dda725";
+                        $token = "f4d17ef66cb5473c6e1fd822a1651b85";
+                        $twilio = new \Twilio\Rest\Client($sid, $token);
+
+date_default_timezone_set('America/Sao_Paulo');
 
 $errors = [];
 $success = null;
@@ -95,6 +101,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $pdo->commit();
                     $success = 'Pedido atualizado com sucesso.';
+
+                    // SE O ADMIN ATUALIZOU O PEDIDO PARA "Concluído"
+                    if ($isAdmin && strtolower($status) === 'concluído') {
+
+                        // Buscar dados reais do pedido
+                        $stmt = $pdo->prepare('SELECT 
+                                p.id,
+                                v.placa,
+                                REPLACE(REPLACE(REPLACE(REPLACE(u.telefone, "(", ""), ")", ""), "-", ""), " ", "") AS telefone_limpo
+                            FROM pedido_servico p
+                            JOIN veiculo v ON v.id = p.id_veiculo
+                            JOIN usuarios u ON u.cpf_usuario = v.cpf_usuario
+                            WHERE p.id = ?');
+
+                        $stmt->execute([$id]);
+                        $info = $stmt->fetch();
+
+                        $numero_servico = $info['id'];   // id do pedido
+                        $placa_veiculo  = $info['placa'];
+
+                        $telefone = (string)$info['telefone_limpo'];
+                        $telefone = preg_replace('/^(\d{2})9(\d{8})$/', '$1$2', $telefone);
+                        $telefone_formatado = "+55" . $telefone;
+
+                        $horario = date('d/m/Y H:i');
+
+                        $template_sid  = "HXa29d968d2164883df940b20558cba443"; 
+
+                        try {
+                            $twilio->messages->create(
+                                "whatsapp:$telefone_formatado",
+                                [
+                                    "from" => "whatsapp:+14155238886",
+                                    "contentSid" => $template_sid,
+                                    "contentVariables" => json_encode([
+                                        "1" => (string)$numero_servico,
+                                        "2" => (string)$placa_veiculo,
+                                        "3" => (string)$horario
+                                    ])
+                                ]
+                            );
+                        } catch (Exception $e) {
+                            error_log("Erro Twilio: " . $e->getMessage());
+                        }
+                    }
+
                 } catch (Exception $e) {
                     $pdo->rollBack();
                     $errors[] = 'Erro ao atualizar pedido: ' . $e->getMessage();
@@ -140,10 +192,14 @@ ORDER BY v.placa')->fetchAll();
 
 $edit = null;
 $itens = [];
+
 // permitir que qualquer usuário visualize um pedido via ?edit=<id>
 if (isset($_GET['edit'])) {
+
     $id = intval($_GET['edit']);
+
     if ($id > 0) {
+
         $stmt = $pdo->prepare('SELECT * FROM pedido_servico WHERE id = ?');
         $stmt->execute([$id]);
         $edit = $stmt->fetch();
@@ -151,6 +207,7 @@ if (isset($_GET['edit'])) {
         $itens = $pdo->prepare('SELECT * FROM item_servico WHERE id_pedido = ? ORDER BY id');
         $itens->execute([$id]);
         $itens = $itens->fetchAll();
+        
     }
 }
 ?>
