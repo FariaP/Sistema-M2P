@@ -1,0 +1,63 @@
+.admin-nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.admin-nav button {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    background: var(--primary-dark);
+    color: #fff;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.status-cards {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.status-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+    padding: 12px;
+    border-radius: 12px;
+    min-width: 140px;
+}
+
+.flex {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row {
+    display: flex;
+    gap: 8px;
+}
+
+.form-row .input {
+    flex: 1
+}
+
+/* pedido_crud */
+.items-table input[type="number"] {
+    width: 120px;
+}
+
+.items-table input[type="text"] {
+    width: 100%;
+}
+
+.total-row {
+    font-weight: 700;
+    text-align: right;
+}

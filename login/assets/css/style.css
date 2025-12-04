@@ -23,6 +23,7 @@ body {
 
 body {
     margin: 0;
+    /* padding: 0 !important; */
     font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial;
     color: var(--text);
     background: var(--bg);
@@ -32,8 +33,9 @@ body {
     min-height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    /* justify-content: center; */
     padding: 40px 16px;
+    padding-top: 0px;
     background:
         radial-gradient(700px 400px at 10% 10%, rgba(59, 175, 218, .12), transparent),
         radial-gradient(700px 400px at 90% 90%, rgba(255, 107, 53, .08), transparent);
@@ -41,13 +43,17 @@ body {
 
 .card {
     width: 100%;
-    max-width: 550px;
+    /* aumentado para comportar tabelas maiores sem barra de rolagem em desktop */
+    max-width: 1100px;
+    /* centralizar horizontalmente dentro do container */
+    margin: 10px auto;
     background: var(--surface);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 28px 26px 22px;
     border: 1px solid var(--border);
     overflow: hidden;
+    /* min-height:100vh; */
 }
 
 .card img {
@@ -99,12 +105,9 @@ h1 {
     transition: transform .05s ease, background .2s ease;
 }
 
-.button:hover {
-    background: var(--orange-dark);
-}
-
 .button:active {
-    transform: translateY(1px);
+    /* sem efeito de clique (mantém posição) */
+    transform: none;
 }
 
 .helper {
@@ -117,11 +120,9 @@ a {
     color: var(--primary);
     text-decoration: none;
     font-weight: 500;
+    text-align: center;
 }
 
-a:hover {
-    color: var(--orange);
-}
 
 .alert {
     background: #2C1810;
@@ -169,4 +170,101 @@ header {
 
 header img {
     height: 34px;
+}
+
+.client-list {
+    margin: 20px 0;
+    overflow-x: auto;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-primary {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    margin: 0 4px;
+}
+
+.btn-edit {
+    background: var(--primary);
+    color: white;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.btn-delete {
+    background: #DC2626;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--orange);
+    color: white;
+    /* manter mesmo tamanho do botão de editar */
+    padding: 6px 12px;
+}
+
+/* remover efeitos de hover para botões (âncoras com classes) */
+.btn-primary:hover,
+.btn-edit:hover,
+.btn-delete:hover {
+    background: unset;
+    /* será redefinido abaixo para manter o mesmo visual */
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--orange);
+}
+
+.btn-edit:hover {
+    background: var(--primary);
+}
+
+.btn-delete:hover {
+    background: #DC2626;
+}
+
+.actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-records {
+    text-align: center;
+    color: var(--muted);
+    margin: 20px 0;
+}
+
+.error {
+    color: #DC2626;
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* regra responsiva: em telas pequenas limita o card à largura do viewport */
+@media (max-width: 700px) {
+    .card {
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .table th,
+    .table td {
+        padding: 8px 10px;
+    }
+}
+
+input[disabled],
+select[disabled],
+textarea[disabled] {
+    opacity: 1 !important;              /* remove a transparência */
+    background-color: #fff !important;  /* cor de fundo normal */
+    color: #000 !important;             /* texto normal */
+    /* cursor: not-allowed;                mostra que está bloqueado */
 }

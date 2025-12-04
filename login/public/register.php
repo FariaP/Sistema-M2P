@@ -30,6 +30,9 @@ unset($_SESSION['ok'], $_SESSION['err']);
       <header><img src="../assets/logo.png" alt="logo" />
       </header>
       <h1>Cadastre-se</h1>
+      <?php if (isset($_SESSION['user']) && ($_SESSION['user']['tipo'] ?? '') === 'admin'): ?>
+        <div style="margin-bottom:10px;"><a href="admin.php" class="button">← Voltar</a></div>
+      <?php endif; ?>
       <?php if ($ok): ?>
         <div class="success alert"><?= htmlspecialchars($ok) ?></div><?php endif; ?>
       <?php if ($err): ?>
